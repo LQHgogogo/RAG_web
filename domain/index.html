@@ -11,7 +11,6 @@
             <a target="_blank" href="https://github.com/LQHgogogo/RAG_web" class="sidebar-title">
                 <span class="rainbow-text">RAG</span>-智能知识问答
             </a>
-            <button class="sidebar-close-btn"><strong>←</strong></button>
             <button class="new-dialog-btn">
                 <strong>+</strong>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新对话&nbsp;&nbsp;&nbsp;&nbsp;
@@ -32,7 +31,7 @@
 
         <div class="main">
             <div class="top-column">
-
+                <button class="sidebar-close-btn"><strong>←</strong></button>
             </div>
 
             <div class="center-container">
@@ -87,11 +86,13 @@
                     </div>
                 </div>
                 <div class="input-box">
-                        <textarea id="dialog-sender" placeholder="向智能知识问答系统提问" rows="2"></textarea>
+                        <textarea id="query-input" placeholder="向智能知识问答系统提问" rows="2"></textarea>
                         <button id="dialog-send-btn"><strong>↑</strong></button>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="./script.js"></script>
 </body>
 </html>
