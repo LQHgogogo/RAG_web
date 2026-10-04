@@ -33,6 +33,7 @@ sidebarCloseBtn.addEventListener("click", () => {
 })
 
 const historyList = document.querySelector(".history-list");
+let currentMessage = null;
 
 async function getMessage(){
     try{
@@ -44,14 +45,52 @@ async function getMessage(){
         if (!Array.isArray(list)) {
             throw new Error("Invalid response format");
         }
-        list.forEach(item =>{
-            const div = document.createElement("div");
-            div.className = 'history-item';
-            div.textContent = item;
-            historyList.appendChild(div);
-        })
+        // 交给渲染函数处理（高亮跟随 currentMessage）
+        renderHistoryList(list);
 
     }catch(err){
         console.error("Error fetching history");
     }
+}
+
+// 根据当前对话信息(currentMessage)渲染历史列表并高亮当前项
+function renderHistoryList(list){
+    historyList.innerHTML = '';            // 清空旧列表（连同旧高亮）
+
+    list.forEach(eachitem =>{
+        const item = document.createElement("div");
+        item.className = 'history-item';
+
+        // 通过检测当前对话信息来决定是否高亮
+        if(eachitem === currentMessage){
+            item.classList.add('active');
+        }
+        item.textContent = eachitem;
+
+        item.addEventListener('click', (e) => {
+            currentMessage = eachitem;      // 更新当前对话信息
+            renderHistoryList(list);        // 重渲染：去旧高亮、亮当前
+            load_History_Message(eachitem);
+        })
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '🗑️';
+
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            delete_History_Message(eachitem);
+        })
+
+        item.appendChild(deleteBtn);
+        historyList.appendChild(item);
+    })
+}
+// 加载消息
+function load_History_Message(message){
+
+}
+
+function delete_History_Message(message){
+
 }
