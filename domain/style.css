@@ -65,24 +65,43 @@ html, body{
     width: 70%;
     height: 100%;
     background: #fff;
-    border: 1px solid #d9d9d9;
+    overflow: hidden;
 }
 
 .dialog-box{
     position: absolute;
-    width: 90%;
-    height: 15%;
-    bottom: 5%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.dialog-box::-webkit-scrollbar{
+    width: 6px;
+}
+.dialog-box::-webkit-scrollbar-thumb{
+    background: #c0c0c0;
+    border-radius: 3px;
+}
+
+.input-box{
+    position: absolute;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+    width: calc(100% - 40px);
+    height: 100px;
     background: #fff;
     border: 1px solid #d9d9d9;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+    z-index: 10;
 }
+
 .messages{
     flex: 1;
     overflow-y: auto;
@@ -94,61 +113,63 @@ html, body{
 
 .msg{
     max-width: 70%;
-    padding: 10px 14px;
+    padding: 12px 16px;
     font-size: 14px;
-    border-radius: 10px;
-    word-break: break-all;
+    border-radius: 12px;
+    word-wrap: break-word;
+    line-height: 1.5;
 }
+
 .aiMsg{
-    align-content: flex-start;
+    align-self: flex-start;
     background: #f1f1f1;
-
+    color: #333;
 }
+
 .userMsg{
-    align-content: flex-end;
-    background: #e1e1e1;
-}
-
-.chat-input-area{
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    border-top: 1px solid #eee;   /* 与消息区分隔线 */
+    align-self: flex-end;
+    background: #333;
+    color: #fff;
 }
 
 
 #dialog-sender{
-    flex: 1;
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 95%;
-    height: 30px;
+    width: calc(100% - 100px);
+    height: 60px;
     border: none;
-    font-size: 17px;
+    font-size: 15px;
     outline: none;
+    padding: 10px 15px;
+    resize: none;                /* 禁用手动拖拽改变大小 */
+    overflow-y: auto;            /* 内容超出时滚动 */
+    font-family: inherit;
+    line-height: 1.5;
+    position: absolute;
+    top: 12px;
+    left: 10px;
 }
 
 #dialog-send-btn{
     position: absolute;
-    bottom: 20%;
-    right: 5%;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
     border: none;
     background: #333;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     color: #ffffff;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 18px;
     padding: 0;
     cursor: pointer;
+    transition: background 0.2s;
 }
 #dialog-send-btn:hover{
-    background: #a9a9a9;
+    background: #555;
 }
 
 .top-column{
