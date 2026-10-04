@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RAG-智能知识问答</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <a target="_blank" href="https://github.com/LQHgogogo/RAG_web" class="sidebar-title">
+                <span class="rainbow-text">RAG</span>-智能知识问答
+            </a>
+            <button class="sidebar-close-btn"><strong>←</strong></button>
+            <button class="new-dialog-btn">
+                <strong>+</strong>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新对话&nbsp;&nbsp;&nbsp;&nbsp;
+            </button>
+
+            <button class="new-dialog-btn add-knowledge-btn">
+                <strong>+</strong>
+                &nbsp;&nbsp;&nbsp;&nbsp;添加知识库
+            </button>
+
+            <div class="history-list">
+                <div class="history-list-title">历史消息</div>
+                <div class="history-item">
+                    示例会话内容
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="top-column">
+
+            </div>
+
+            <div class="center-container">
+                <div class="dialog-box">
+                    <div class="messages">
+                        <div class="message-ai">
+                            示例会话内容
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <input id="dialog-sender" type="text" placeholder="向智能知识问答系统提问">
+                        <button id="dialog-send-btn"><strong>↑</strong></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
