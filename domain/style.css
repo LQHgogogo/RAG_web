@@ -293,3 +293,96 @@ html, body{
 .add-knowledge-btn{
     top: 140px;
 }
+
+/* ===== 弹窗（添加知识库） ===== */
+.modal-overlay{
+    position: fixed;
+    inset: 0;                      /* top/right/bottom/left 都是 0 */
+    background: rgba(0, 0, 0, 0.4);  /* 半透明遮罩 */
+    display: flex;
+    align-items: center;            /* 垂直居中 */
+    justify-content: center;        /* 水平居中 */
+    z-index: 999;
+}
+
+.modal{
+    width: 420px;
+    max-width: 90%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: modalIn 0.2s ease;    /* 弹窗弹入动画 */
+}
+
+@keyframes modalIn{
+    from{
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to{
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.modal-close{
+    border: none;
+    background: none;
+    font-size: 22px;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal-close:hover{
+    color: #333;
+}
+
+.modal-body{
+    padding: 20px 18px;
+}
+
+.modal-body input[type="file"]{
+    box-sizing: border-box;      /* 宽度包含 padding/border，避免溢出 */
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.modal-footer{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 8px 18px 18px;
+}
+
+.modal-footer button{
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+    font-size: 14px;
+}
+.modal-footer button:hover{
+    background: #f0f0f0;
+}
+.modal-footer button:last-child{
+    background: #333333;
+    color: #fff;
+    border-color: #333333;
+}
+.modal-footer button:last-child:hover{
+    background: #555;
+}

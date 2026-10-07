@@ -10,15 +10,13 @@ function sendMessage(){
     // 确保有会话 id，没有就用系统时间生成
     ensureCurrentMessage();
 
-    // 渲染用户消息（复用封装函数）
+    // 渲染用户消息
     appendMessage('user', text);
     queryInput.value = '';
     dialogBox.scrollTop = dialogBox.scrollHeight;
-    
-    // 保存用户消息
+
     saveMessage(text, 'user');
 
-    // 请求 AI 回复并渲染、保存
     (async () => {
         const aimsg = await getAIresponse(text);
         appendMessage('ai', aimsg);
@@ -26,7 +24,6 @@ function sendMessage(){
     })();
 }
 
-// 保存一条消息到当前会话
 async function saveMessage(text, role){
     if(!text || !currentMessage) return;   // 没有会话就不存
 
@@ -167,7 +164,7 @@ async function load_History_Message(message){
 // 删除历史会话
 async function delete_History_Message(id){
     // 1. 调后端删除接口（删掉对应会话文件）
-    const res = await fetch(`http://localhost:8080/api/deleteChat?id=${encodeURIComponent(id)}`, {
+    const res = await fetch(`http://localhost:8080/api/deleteHistory?id=${encodeURIComponent(id)}`, {
         method: 'DELETE'
     });
     if (!res.ok) {
@@ -175,8 +172,6 @@ async function delete_History_Message(id){
     }
 
     if (id === currentMessage) {
-        currentMessage = null;
-        dialogBox.innerHTML = '';
         new_dialog();
     }
 
@@ -187,14 +182,91 @@ const newDialogBtn = document.querySelector(".new-dialog-btn");
 const newKnowledgeBtn = document.querySelector(".add-knowledge-btn");
 
 function new_dialog(){
-
+    currentMessage = null;
+    dialogBox.innerHTML = '';
+    getHistoryListAsync();
 }
 newDialogBtn.addEventListener("click", new_dialog);
 
 function add_knowledge(){
+    const overlay = document.createElement("div");
+    overlay.className = 'modal-overlay';
 
+    const modal = document.createElement("div");
+    modal.className = 'modal';
+
+    const header = document.createElement("div");
+    header.className = 'modal-header';
+    const title = document.createElement("span");
+    title.textContent = '添加知识库';
+    const closeBtn = document.createElement("button");
+    closeBtn.className = 'modal-close';
+    closeBtn.textContent = '×';
+
+    closeBtn.addEventListener('click', () => {
+        overlay.remove();
+    });
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+
+    // 文件选择
+    const body = document.createElement("div");
+    body.className = 'modal-body';
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.multiple = true;
+    fileInput.id = 'kb-file';
+    body.appendChild(fileInput);
+
+    const footer = document.createElement("div");
+    footer.className = 'modal-footer';
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = '取消';
+    const confirmBtn = document.createElement("button");
+    confirmBtn.textContent = '提交';
+
+    cancelBtn.addEventListener('click', () => {
+        overlay.remove();
+    });
+
+    // 提交 → 上传文件
+    confirmBtn.addEventListener('click', async () => {
+        if(fileInput.files.length === 0){
+            alert('请先选择文件');
+            return;
+        }
+        const formData = new FormData();
+        for (const file of fileInput.files){
+            formData.append('files', file);
+        }
+        const res = await fetch('http://localhost:8080/api/uploadKnowledge', {
+            method: 'POST',
+            body: formData
+        });
+        if (res.ok) {
+            alert('上传成功');
+            overlay.remove();
+        } else {
+            alert('上传失败');
+        }
+    });
+
+    footer.appendChild(cancelBtn);
+    footer.appendChild(confirmBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+
+    overlay.addEventListener('click', (e) => {
+        if(e.target === overlay){
+            overlay.remove();
+        }
+    });
+
+    document.body.appendChild(overlay);
 }
 newKnowledgeBtn.addEventListener("click", add_knowledge);
 
-// 页面加载后自动加载历史对话列表
 getHistoryListAsync();
