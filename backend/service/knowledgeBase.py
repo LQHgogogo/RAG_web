@@ -6,7 +6,8 @@ from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from backend.service import config_data
+from backend.config import config_data
+
 
 def save_md5(text: str):
     with open(config_data.md5_path, 'a', encoding='utf-8') as f:
@@ -17,11 +18,10 @@ def check_md5(text: str):
         for line in open(config_data.md5_path, 'r').readlines():
             if(line.strip() == text):
                 return True
-            else:
-                return False
-    else:
-        open(config_data.md5_path, 'w', encoding='utf-8').close()
         return False
+
+    open(config_data.md5_path, 'w', encoding='utf-8').close()
+    return False
 
 def get_str_into_md5(text: str):
     str_bytes = text.encode('utf-8')

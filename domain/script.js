@@ -2,7 +2,13 @@ const dialogBox = document.querySelector(".dialog-box");
 const sendBtn = document.querySelector("#dialog-send-btn");
 const queryInput = document.querySelector("#query-input");
 
-function sendMessage(){
+const topIdEl = document.querySelector("#top-id");
+
+function updateTopId(){
+    topIdEl.textContent = currentMessage ? currentMessage : '';
+}
+
+async function sendMessage(){
     const text = queryInput.value.trim();
 
     if (!text) return;
@@ -15,12 +21,16 @@ function sendMessage(){
     queryInput.value = '';
     dialogBox.scrollTop = dialogBox.scrollHeight;
 
-    saveMessage(text, 'user');
+    await saveMessage(text, 'user');
 
     (async () => {
-        const aimsg = await getAIresponse(text);
-        appendMessage('ai', aimsg);
-        saveMessage(aimsg, 'ai');
+        appendMessage('ai', '检索思考中...');          // 先建一条 AI 气泡显示“思考中”，流式数据到达后覆盖
+        const lastMsg = dialogBox.querySelectorAll('.msg');
+        lastMsg[lastMsg.length - 1].classList.add('thinking');
+        const aimsg = await getAIresponse();
+        const aiEl = dialogBox.querySelectorAll('.msg-ai');
+        aiEl[aiEl.length - 1].textContent = aimsg;   // 流式结束，确保最终内容
+        await saveMessage(aimsg, 'ai');
     })();
 }
 
@@ -38,31 +48,75 @@ async function saveMessage(text, role){
     });
 }
 
-// 请求 AI 回复
-async function getAIresponse(text){
+async function getAIresponse(){
     const response = await fetch('http://localhost:8080/api/getAIresponse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            message: text,
             id: currentMessage
         })
     });
     if (!response.ok) {
         throw new Error("Network response was not ok");
     }
-    const data = await response.json();
-    return data.content;
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let fullText = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+                fullText += data;
+                appendStreamText(fullText);
+            }
+        }
+    }
+    return fullText;
+}
+
+function appendStreamText(text){
+    const aiEls = dialogBox.querySelectorAll('.msg-ai');
+    const last = aiEls[aiEls.length - 1];
+    if (last) {
+        last.closest('.msg').classList.remove('thinking');  // 收到首个真实内容，停止思考动画
+        last.textContent = text;
+    }
+    dialogBox.scrollTop = dialogBox.scrollHeight;
 }
 
 function ensureCurrentMessage(){
     if(!currentMessage){
-        currentMessage = '对话' + Date.now();
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        currentMessage = '对话' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+        updateTopId();
     }
+}
+
+function showEmptyState(){
+    dialogBox.innerHTML = '';
+    const empty = document.createElement("div");
+    empty.className = 'empty-state';
+    empty.textContent = '本系统是RAG检索增强知识问答系统，欢迎提问';
+    dialogBox.appendChild(empty);
 }
 
 function appendMessage(role, content){
     const msg = document.createElement("div");
+
+    const empty = dialogBox.querySelector('.empty-state');
+    if (empty) empty.remove();
 
     if(role === 'ai'){
         msg.className = 'msg aiMsg';
@@ -103,7 +157,7 @@ async function getHistoryListAsync(){
         if (!res.ok) {
             throw new Error("Network response was not ok");
         }
-        const list = await res.json();
+        const list = (await res.json()).result;
         if (!Array.isArray(list)) {
             throw new Error("Invalid response format");
         }
@@ -129,6 +183,7 @@ function renderHistoryList(list){
 
         item.addEventListener('click', (e) => {
             currentMessage = eachitem;      // 更新当前对话信息
+            updateTopId();
             renderHistoryList(list);        // 重渲染：去旧高亮、亮当前
             load_History_Message(eachitem);
         })
@@ -183,7 +238,8 @@ const newKnowledgeBtn = document.querySelector(".add-knowledge-btn");
 
 function new_dialog(){
     currentMessage = null;
-    dialogBox.innerHTML = '';
+    updateTopId();
+    showEmptyState();
     getHistoryListAsync();
 }
 newDialogBtn.addEventListener("click", new_dialog);
@@ -270,3 +326,4 @@ function add_knowledge(){
 newKnowledgeBtn.addEventListener("click", add_knowledge);
 
 getHistoryListAsync();
+showEmptyState();

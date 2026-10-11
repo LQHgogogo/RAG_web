@@ -1,5 +1,5 @@
 from langchain_chroma import Chroma
-from config_data import persist_dir, collection_name
+from backend.config.config_data import persist_dir, collection_name
 
 
 class VectorService:
