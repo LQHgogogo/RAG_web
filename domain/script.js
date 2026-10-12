@@ -29,7 +29,7 @@ async function sendMessage(){
         lastMsg[lastMsg.length - 1].classList.add('thinking');
         const aimsg = await getAIresponse();
         const aiEl = dialogBox.querySelectorAll('.msg-ai');
-        aiEl[aiEl.length - 1].textContent = aimsg;   // 流式结束，确保最终内容
+        aiEl[aiEl.length - 1].innerHTML = mdToHtml(aimsg);   // 流式结束，确保最终内容
         await saveMessage(aimsg, 'ai');
     })();
 }
@@ -90,7 +90,7 @@ function appendStreamText(text){
     const last = aiEls[aiEls.length - 1];
     if (last) {
         last.closest('.msg').classList.remove('thinking');  // 收到首个真实内容，停止思考动画
-        last.textContent = text;
+        last.innerHTML = mdToHtml(text);
     }
     dialogBox.scrollTop = dialogBox.scrollHeight;
 }
@@ -112,6 +112,15 @@ function showEmptyState(){
     dialogBox.appendChild(empty);
 }
 
+function escapeHtml(str){
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+              .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function mdToHtml(md){
+    return marked.parse(escapeHtml(md), { breaks: true });
+}
+
 function appendMessage(role, content){
     const msg = document.createElement("div");
 
@@ -121,7 +130,7 @@ function appendMessage(role, content){
     if(role === 'ai'){
         msg.className = 'msg aiMsg';
         msg.innerHTML = '<div class="msg-ai"></div>';
-        msg.querySelector('.msg-ai').textContent = content;
+        msg.querySelector('.msg-ai').innerHTML = mdToHtml(content);
     } else if(role === 'user'){
         msg.className = 'msg userMsg';
         msg.innerHTML = '<div class="msg-user"></div>';

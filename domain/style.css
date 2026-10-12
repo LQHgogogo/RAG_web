@@ -194,6 +194,17 @@ html, body{
     color: #fff;
 }
 
+/* 让渲染出的 Markdown 内容边距跟随消息气泡，避免 <p> 自带的大空白 */
+.msg-ai p, .msg-ai ul, .msg-ai ol{
+    margin: 0 0 8px 0;
+}
+.msg-ai p:last-child, .msg-ai ul:last-child, .msg-ai ol:last-child{
+    margin-bottom: 0;
+}
+.msg-ai pre, .msg-ai code{
+    font-family: Consolas, 'Courier New', monospace;
+}
+
 
 #query-input{
     width: calc(100% - 100px);
